@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/custom-forms@0.2.1/dist/custom-forms.min.css"
+    rel="stylesheet" />
+
+  <link href="https://www.unpkg.com/codemirror@5.59.4/lib/codemirror.css" rel="stylesheet" />
+  <link href="https://www.unpkg.com/codemirror@5.59.4/addon/lint/lint.css" rel="stylesheet" />
+
+  <!-- Main Quill library -->
+  <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
+  <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+  <!-- Theme included stylesheets -->
+  <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+
+
+  <title>/chapters/loop-601/pages/1 | CodeBase Team</title>
+
+  <script>
+    window.onload = () => {
+      // get text in quill editor
+      //document.getElementsByName('intro-card-desc')[0].querySelector('p').innerText
+
+      let quillOption = {
+        modules: {
+          toolbar: [
+            // [{ header: [1, 2, false] }],
+            ['bold', 'italic', 'underline'],
+            // ['image', 'code-block']
+          ]
+        },
+        // placeholder: 'Compose an epic...',
+        theme: 'snow'  // or 'bubble'
+      }
+
+      new Quill("[name='intro-card-desc']", quillOption);
+      new Quill("[name='img-list-desc']", quillOption);
+      new Quill("[name='img-step-desc']", quillOption);
+      new Quill("[name='custom-desc']", quillOption);
+      new Quill("[name='custom-custom']", quillOption);
+      new Quill("[name='quiz-template-desc']", quillOption);
+      new Quill("[name='story-order-desc']", quillOption);
+      new Quill("[name='sorting-desc']", quillOption);
+
+    }
+
+    let addImgSrc = (imgBody, imgHoverSec, imgCapAtHover, imgSrcAtHover, imgCheckBox, imgTable, imgBtn, imgCate) => {
+      let imgSrcNode = document.getElementsByClassName(imgBody);
+      let newNode = imgSrcNode[0].cloneNode(true);
+      let inputNewNode = newNode.querySelectorAll('input');
+      for (let i = 0; i < inputNewNode.length; i++) {
+        let ele = inputNewNode[i];
+        ele.value = '';
+        if (ele.type == 'checkbox') {
+          ele.checked = false;
+        }
+        // set hover option row to display none
+        if (i == 3 || i == 4) {
+          ele.parentElement.parentElement.style.display = 'none';
+        }
+      }
+      let newId = imgSrcNode.length;
+      newNode.id = imgBody + '-' + newId;
+      let imgCaption = newNode.querySelector('[name="' + imgCate + '-caption"]');
+      imgCaption.name = imgCaption.name + '-' + newId;
+      let imgSrc = newNode.querySelector('[name="' + imgCate + '-src"]');
+      imgSrc.name = imgSrc.name + '-' + newId;
+      let imgCaptionHover = newNode.querySelector('[name="' + imgCate + '-caption-hover"]');
+      imgCaptionHover.name = imgCaptionHover.name + '-' + newId;
+      let imgSrcHover = newNode.querySelector('[name="' + imgCate + '-src-hover"]');
+      imgSrcHover.name = imgSrcHover.name + '-' + newId;
+      let imgCaptionHoverRow = newNode.querySelector('#' + imgCapAtHover);
+      imgCaptionHoverRow.className = imgHoverSec + '-' + newId;
+      let imgSrcHoverRow = newNode.querySelector('#' + imgSrcAtHover);
+      imgSrcHoverRow.className = imgHoverSec + '-' + newId;
+      let imgCheckbox = newNode.querySelector('.' + imgCheckBox);
+      imgCheckbox.id = imgCheckBox + '-' + newId;
+      let imgSrcTable = document.getElementById(imgTable);
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      const hr = document.createElement("hr");
+      let hrBarClass = imgBody + '-hr';
+      tr.className = hrBarClass;
+      td.setAttribute('colspan', 2);
+      hr.className = 'my-8'
+      hr.style.cssText = 'border-top-width: 3px;border-color: #1947e5;'
+      td.appendChild(hr);
+      tr.appendChild(td);
+      imgSrcTable.appendChild(tr);
+      if (imgSrcNode.length == 1) {
+        const removeBtn = document.createElement('button');
+        removeBtn.className = "my-2 px-3 py-2 mx-3 rounded-lg bg-red-500";
+        removeBtn.id = imgBody + '-rm-btn';
+        removeBtn.innerHTML = 'remove';
+        removeBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          removeImgSrc(imgBody, hrBarClass, removeBtn.id);
+        });
+        let imgSec = document.getElementById(imgBtn);
+        imgSec.appendChild(removeBtn);
+      }
+      imgSrcTable.appendChild(newNode);
+    }
+
+    let removeImgSrc = (imgSecName, hrBarClass, btnId) => {
+      let imgNode = document.getElementsByClassName(imgSecName);
+      if (imgNode.length > 1) {
+        imgNode[imgNode.length - 1].remove();
+        let imgSrcBar = document.getElementsByClassName(hrBarClass);
+        imgSrcBar[imgSrcBar.length - 1].remove();
+      }
+      if (imgNode.length < 2) {
+        document.getElementById(btnId).remove();
+      }
+    }
+
+    let addHover = (id, value, hoverName) => {
+      let targetId = id[id.length - 1];
+      let target = document.getElementsByClassName(hoverName + '-' + targetId);
+      for (let i = 0; i < target.length; i++) {
+        if (value) {
+          target[i].style.display = 'table-row';
+        } else {
+          target[i].style.display = 'none';
+        }
+      }
+    }
+
+
+    let changeTemplate = (t) => {
+      let selected = t.value;
+      let templates = document.getElementsByName('template');
+      for (let i = 0; i < templates.length; i++) {
+        if (templates[i].id == selected) {
+          templates[i].style.display = 'block';
+        } else {
+          templates[i].style.display = 'none';
+        }
+      }
+    }
+
+  </script>
+
+</head>
+
+<body>
+  <main class="mb-12">
+    <nav style="background-color: #1947e5">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <a href="/v1">
+              <div class="flex-shrink-0">
+                <img class="h-10 w-10" src="https://hopper-dot-coding-thailand.el.r.appspot.com/static/v1/codebase.svg"
+                  alt="Logo" />
+              </div>
+            </a>
+            <div class="hidden md:block">
+              <div class="ml-10 flex items-baseline space-x-4">
+                <a href="/v1" class="
+                      text-gray-300
+                      hover:bg-blue-600
+                      hover:text-white
+                      px-3
+                      py-2
+                      rounded-md
+                      text-sm
+                      font-medium
+                    ">Dashboard</a>
+                <a href="/v1/status" class="
+                      text-gray-300
+                      hover:bg-blue-600
+                      hover:text-white
+                      px-3
+                      py-2
+                      rounded-md
+                      text-sm
+                      font-medium
+                    ">Status</a>
+                <a href="/v1/account" class="
+                      text-gray-300
+                      hover:bg-blue-600
+                      hover:text-white
+                      px-3
+                      py-2
+                      rounded-md
+                      text-sm
+                      font-medium
+                    ">Account</a>
+                <a href="/v1/sign-out" class="
+                      text-gray-300
+                      hover:bg-blue-600
+                      hover:text-white
+                      px-3
+                      py-2
+                      rounded-md
+                      text-sm
+                      font-medium
+                    ">Sign Out</a>
+              </div>
+            </div>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-4 flex items-center md:ml-6">
+              <div class="ml-3 relative">
+                <div>
+                  <img class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1464746133101-a2c3f88e0dd9?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=256&h=256&q=80"
+                    alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="container mx-auto">
+      <div class="mt-8">
+        <h1 class="text-4xl">Page</h1>
+      </div>
+      <form action="/v1/pages/EmysFgI-WkHJOWOu5vNgNtFd/save/" method="post">
+        <div class="mt-6">
+          <div class="shadow-lg" style="
+              position: fixed;
+              top: 0;
+              right: 0;
+              margin-top: 64px;
+              margin-right: 40px;
+              padding: 8px 16px;
+              background-color: dodgerblue;
+              color: white;
+              z-index: 1000;
+            ">
+            <h2 class="text-base">Ordering Weight</h2>
+            <h1 class="text-6xl">1</h1>
+          </div>
+          <div class="mb-4">
+            <a href="/v1/chapters/IvHZ5vHNUNuMPOKldOaaPO9S/pages" class="text-blue-600">Back to chapter's pages</a>
+          </div>
+          <table class="table-auto" style="width: 100% !important">
+            <tbody>
+              <tr>
+                <td class='w-96'>Page ID</td>
+                <td>
+                  <div class="my-2">EmysFgI-WkHJOWOu5vNgNtFd</div>
+                </td>
+              </tr>
+              <tr>
+                <td class='w-96'>Chapter</td>
+                <td>
+                  <div class="my-2">IvHZ5vHNUNuMPOKldOaaPO9S</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="color: red" class='w-96'>Page Ordering Weight</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="orderingWeight"
+                    placeholder="Page Ordering Weight" value="1" required />
+                </td>
+              </tr>
+              <tr>
+                <td style="color: red" class='w-96'>Page URI</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="pageUri" placeholder="Page Uri"
+                    value="/chapters/loop-601/pages/1" required />
+                </td>
+              </tr>
+              <tr>
+                <td class='w-96'>Layout</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="layout" placeholder="Page Layout"
+                    value="default" required />
+                </td>
+              </tr>
+              <tr>
+                <td class='w-96'>XP Score</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="number" name="xpScore" placeholder="Page XP Score"
+                    value="10" value="10" required />
+                </td>
+              </tr>
+              <tr>
+                <td class='w-96'>Average Time</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="averageTime" placeholder="Page Time" value="2"
+                    required />
+                </td>
+              </tr>
+              <tr>
+                <td class='w-96'>Status</td>
+                <td>
+                  <select class="w-96 form-select my-2" name="status" required>
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td class='w-96'>Content Template</td>
+                <td>
+                  <select class="w-96 form-select my-2" id="template-dropdown" onchange="changeTemplate(this)" required>
+                    <option value="introCard" selected>Intro Card</option>
+                    <option value="imageList">Image List</option>
+                    <option value="imageStep">Image Step</option>
+                    <option value="custom">Custom</option>
+                    <option value="quizTemplate">Quiz Template</option>
+                    <option value="storyOrder">Story Order</option>
+                    <option value="sorting">Sorting</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+
+          </table>
+        </div>
+        <div class="intro-card" id='introCard' name='template'>
+          <div class="mt-8">
+            <h1 class="text-4xl">Intro Card</h1>
+          </div>
+          <table class="table-auto mt-6" style="width: 100% !important">
+            <tbody>
+              <tr>
+                <td class="w-96">Title</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="intro-card-title" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Description</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='intro-card-desc'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="img-list" id='imageList' style='display: none' name='template'>
+          <div class="mt-8">
+            <h1 class="text-4xl">Image List</h1>
+          </div>
+          <table class="table-auto mt-6" style="width: 100% !important" id='img-list-table'>
+            <tbody>
+              <tr>
+                <td class="w-96">Title</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="img-list-title" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Description</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='img-list-desc'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Image Per Row</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="number" name="img-list-img-per-row" required min="0"
+                    value="3"></input>
+                </td>
+              </tr>
+              <tr class='h-14'>
+                <td class="font-bold my-10">Source</td>
+              </tr>
+            </tbody>
+            <tbody class="img-list-src-body">
+              <tr>
+                <td class="w-96">Caption</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="img-list-caption" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="my-2">Src</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="img-list-src" accept="image/*" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">
+                  Add Hover
+                </td>
+                <td>
+                  <input class="w-96 form-checkbox my-2 img-list-checkbox" type="checkbox" id='img-list-checkbox-0'
+                    onchange="(addHover(this.id,this.checked,'img-list-hover'))" />
+                </td>
+              </tr>
+              <tr class='img-list-hover-0' id="img-list-caption-hover" style="display: none;">
+                <td class="w-96">Caption Hover</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="img-list-caption-hover" required />
+                </td>
+              </tr>
+              <tr class='img-list-hover-0' id="img-list-src-hover" style="display: none;">
+                <td class="my-2">Src Hover</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="img-list-src-hover" accept="image/*" required />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="img-list-btn">
+            <button class="my-2 px-3 py-2 rounded-lg bg-green-500"
+              onclick="addImgSrc('img-list-src-body','img-list-hover','img-list-caption-hover','img-list-src-hover','img-list-checkbox','img-list-table','img-list-btn','img-list')">add</button>
+          </div>
+        </div>
+        <div class="img-step" id='imageStep' style='display: none' name='template'>
+          <div class="mt-8">
+            <h1 class="text-4xl">Image Step</h1>
+          </div>
+          <table class="table-auto mt-6" style="width: 100% !important" id='img-step-table'>
+            <tbody>
+              <tr>
+                <td class="w-96">Title</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="img-step-title" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Description</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='img-step-desc'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Image Per Row</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="number" name="img-step-img-per-row" required min="0"
+                    value="1"></input>
+                </td>
+              </tr>
+              <tr class='h-14'>
+                <td class="font-bold my-10">Source</td>
+              </tr>
+            </tbody>
+            <tbody class="img-step-src-body">
+              <tr>
+                <td class="w-96">Caption</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="img-step-caption" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="my-2">Src</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="img-step-src" accept="image/*" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">
+                  Add Hover
+                </td>
+                <td>
+                  <input class="w-96 form-checkbox my-2 img-step-checkbox" type="checkbox" id='img-step-checkbox-0'
+                    onchange="(addHover(this.id,this.checked,'img-step-hover'))" />
+                </td>
+              </tr>
+              <tr class='img-step-hover-0' id="img-step-caption-hover" style="display: none;">
+                <td class="w-96">Caption Hover</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="img-step-caption-hover" required />
+                </td>
+              </tr>
+              <tr class='img-step-hover-0' id="img-step-src-hover" style="display: none;">
+                <td class="my-2">Src Hover</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="img-step-src-hover" accept="image/*" required />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="img-step-btn">
+            <button class="my-2 px-3 py-2 rounded-lg bg-green-500"
+              onclick="addImgSrc('img-step-src-body','img-step-hover','img-step-caption-hover','img-step-src-hover','img-step-checkbox','img-step-table','img-step-btn','img-step')">add</button>
+          </div>
+        </div>
+        <div class="custom" id='custom' style='display: none' name='template'>
+          <div class="mt-8">
+            <h1 class="text-4xl">Custom</h1>
+          </div>
+          <table class="table-auto mt-6" style="width: 100% !important">
+            <tbody>
+              <tr>
+                <td class="w-96">Title</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="custom-title" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Description</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='custom-desc'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Custom</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='custom-custom'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="quiz-template" id='quizTemplate' style='display: none' name='template'>
+          <div class="mt-8">
+            <h1 class="text-4xl">Quiz Template</h1>
+          </div>
+          <table class="table-auto mt-6" style="width: 100% !important" id='quiz-template-table'>
+            <tbody>
+              <tr>
+                <td class="w-96">Title</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="quiz-template-title" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Description</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='quiz-template-desc'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Image Per Row</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="number" name="quiz-template-img-per-row" required min="0"
+                    value="3"></input>
+                </td>
+              </tr>
+              <tr class='h-14'>
+                <td class="font-bold my-10">Source</td>
+              </tr>
+            </tbody>
+            <tbody class="quiz-template-src-body">
+              <tr>
+                <td class="w-96">Caption</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="quiz-template-caption" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="my-2">Src</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="quiz-template-src" accept="image/*" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">
+                  Add Hover
+                </td>
+                <td>
+                  <input class="w-96 form-checkbox my-2 quiz-template-checkbox" type="checkbox"
+                    id='quiz-template-checkbox-0' onchange="(addHover(this.id,this.checked,'quiz-template-hover'))" />
+                </td>
+              </tr>
+              <tr class='quiz-template-hover-0' id="quiz-template-caption-hover" style="display: none;">
+                <td class="w-96">Caption Hover</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="quiz-template-caption-hover" required />
+                </td>
+              </tr>
+              <tr class='quiz-template-hover-0' id="quiz-template-src-hover" style="display: none;">
+                <td class="my-2">Src Hover</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="quiz-template-src-hover" accept="image/*" required />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="quiz-template-btn">
+            <button class="my-2 px-3 py-2 rounded-lg bg-green-500"
+              onclick="addImgSrc('quiz-template-src-body','quiz-template-hover','quiz-template-caption-hover','quiz-template-src-hover','quiz-template-checkbox','quiz-template-table','quiz-template-btn','quiz-template')">add</button>
+          </div>
+        </div>
+        <div class="story-order" id='storyOrder' style='display: none' name='template'>
+          <div class="mt-8">
+            <h1 class="text-4xl">Story Order</h1>
+          </div>
+          <table class="table-auto mt-6" style="width: 100% !important" id='story-order-table'>
+            <tbody>
+              <tr>
+                <td class="w-96">Title</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="story-order-title" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Description</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='story-order-desc'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Image Per Row</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="number" name="story-order-img-per-row" required min="0"
+                    value="3"></input>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Random Check List</td>
+                <td>
+                  <input class="w-96 form-checkbox my-2" type="checkbox" name='story-order-random' />
+                </td>
+              </tr>
+              <tr class='h-14'>
+                <td class="font-bold my-10">Source</td>
+              </tr>
+            </tbody>
+            <tbody class="story-order-src-body">
+              <tr>
+                <td class="w-96">Caption</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="story-order-caption" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="my-2">Src</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="story-order-src" accept="image/*" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">
+                  Add Hover
+                </td>
+                <td>
+                  <input class="w-96 form-checkbox my-2 story-order-checkbox" type="checkbox"
+                    id='story-order-checkbox-0' onchange="(addHover(this.id,this.checked,'story-order-hover'))" />
+                </td>
+              </tr>
+              <tr class='story-order-hover-0' id="story-order-caption-hover" style="display: none;">
+                <td class="w-96">Caption Hover</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="story-order-caption-hover" required />
+                </td>
+              </tr>
+              <tr class='story-order-hover-0' id="story-order-src-hover" style="display: none;">
+                <td class="my-2">Src Hover</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="story-order-src-hover" accept="image/*" required />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="story-order-btn">
+            <button class="my-2 px-3 py-2 rounded-lg bg-green-500"
+              onclick="addImgSrc('story-order-src-body','story-order-hover','story-order-caption-hover','story-order-src-hover','story-order-checkbox','story-order-table','story-order-btn','story-order')">add</button>
+          </div>
+        </div>
+        <div class="sorting" id='sorting' style='display: none' name='template'>
+          <div class="mt-8">
+            <h1 class="text-4xl">Sorting</h1>
+          </div>
+          <table class="table-auto mt-6" style="width: 100% !important" id='sorting-table'>
+            <tbody>
+              <tr>
+                <td class="w-96">Title</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="sorting-title" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Description</td>
+                <td>
+                  <div class="w-96 my-2">
+                    <div name='sorting-desc'>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Image Per Row</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="number" name="sorting-img-per-row" required min="0"
+                    value="3"></input>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">Random Check List</td>
+                <td>
+                  <input class="w-96 form-checkbox my-2" type="checkbox" name='sorting-random' />
+                </td>
+              </tr>
+              <tr class='h-14'>
+                <td class="font-bold my-10">Source</td>
+              </tr>
+            </tbody>
+            <tbody class="sorting-src-body">
+              <tr>
+                <td class="w-96">Caption</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="sorting-caption" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="my-2">Src</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="sorting-src" accept="image/*" required />
+                </td>
+              </tr>
+              <tr>
+                <td class="w-96">
+                  Add Hover
+                </td>
+                <td>
+                  <input class="w-96 form-checkbox my-2 sorting-checkbox" type="checkbox" id='sorting-checkbox-0'
+                    onchange="(addHover(this.id,this.checked,'sorting-hover'))" />
+                </td>
+              </tr>
+              <tr class='sorting-hover-0' id="sorting-caption-hover" style="display: none;">
+                <td class="w-96">Caption Hover</td>
+                <td>
+                  <input class="w-96 form-input my-2" type="text" name="sorting-caption-hover" required />
+                </td>
+              </tr>
+              <tr class='sorting-hover-0' id="sorting-src-hover" style="display: none;">
+                <td class="my-2">Src Hover</td>
+                <td>
+                  <input class="w-96 my-2" type="file" name="sorting-src-hover" accept="image/*" required />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="sorting-btn">
+            <button class="my-2 px-3 py-2 rounded-lg bg-green-500"
+              onclick="addImgSrc('sorting-src-body','sorting-hover','sorting-caption-hover','sorting-src-hover','sorting-checkbox','sorting-table','sorting-btn','sorting')">add</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="https://www.unpkg.com/codemirror@5.59.4/lib/codemirror.js"></script>
+  <script src="https://www.unpkg.com/codemirror@5.59.4/mode/javascript/javascript.js"></script>
+  <script src="https://codemirror.net/2/lib/util/formatting.js"></script>
+  <script src="https://www.unpkg.com/codemirror@5.59.4/addon/edit/closebrackets.js"></script>
+  <script src="https://www.unpkg.com/codemirror@5.59.4/addon/edit/matchbrackets.js"></script>
+  <script src="https://www.unpkg.com/codemirror@5.59.4/addon/lint/lint.js"></script>
+  <script src="https://www.unpkg.com/codemirror@5.59.4/addon/lint/json-lint.js"></script>
+</body>
+
+</html>
